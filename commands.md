@@ -26,5 +26,7 @@ pip install pytest
 
 pip install pytest-django
 
+python manage.py startapp products ./ecommerce/products 
+
 # Pytest
 pytest -h    # prints options _and_ config file settings
