@@ -42,5 +42,8 @@ pip install pytest-cov
 
 coverage run -m pytest
 
+python manage.py createsuperuser
+
+
 # Pytest
 pytest -h    # prints options _and_ config file settings
