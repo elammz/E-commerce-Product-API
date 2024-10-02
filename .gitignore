@@ -2,5 +2,9 @@ env/
 .pytest_cache
 **__pycache__/
 db.sqlite3
-.env.coverage
+.env
+.coverage
 .vscode
+schema.yml
+*-commands.md
+htmlcov/
