@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     #Internal Apps
     'ecommerce.products',  # django will not find the app with out ecommerce. since we created it inside the projects folder
+    "mptt",
 
 ]
 
