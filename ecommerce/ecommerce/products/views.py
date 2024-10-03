@@ -1,5 +1,6 @@
 from django.db import connection
 from django.shortcuts import render
+from django.db.models import Prefetch
 from rest_framework import viewsets
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
@@ -11,6 +12,7 @@ from sqlparse import format
 
 from .models import Category, Brand, Product
 from .serializers import CategorySerializer, BrandSerializer, ProductSerializer
+
 
 class CategoryViewSet(viewsets.ViewSet):
     """
@@ -41,33 +43,32 @@ class ProductViewSet(viewsets.ViewSet):
     A simple Viewset for viewing products
     """
 
-    queryset = Product.objects.all()  # Will collect all the products from the product table
+    queryset = Product.objects.all().isactive()  # Will collect all the products from the product table
     
     lookup_field = "slug"
 
     def retrieve(self, request, slug=None):
-        serializer = ProductSerializer(self.queryset.filter(slug=slug).select_related("category"), many=True)
-
-        x = self.queryset.filter(slug=slug)
-        sqlformatted = format(str(x.query), reindent=True)
-        print(highlight(sqlformatted, SqlLexer(), TerminalFormatter()))
-
-
-        return Response(serializer.data)
-
-
-    @extend_schema(responses=ProductSerializer)
-    def list(self, request, slug=None):
-        serializer = ProductSerializer(self.queryset, many=True) #passing the collected data to our serializer
+        serializer = ProductSerializer(
+            Product.objects.filter(slug=slug)
+            .select_related("category", "brand")
+            .prefetch_related(Prefetch("product_line__product_image")),
+            many=True,
+        )
         data = Response(serializer.data)
 
         q = list(connection.queries)
-        # print(len(q))
+        print(len(q))
         for qs in q:
             sqlformatted = format(str(qs["sql"]), reindent=True)
             print(highlight(sqlformatted, SqlLexer(), TerminalFormatter()))
 
         return data
+
+    @extend_schema(responses=ProductSerializer)
+    def list(self, request, slug=None):
+        serializer = ProductSerializer(self.queryset, many=True) #passing the collected data to our serializer
+
+        return Response(serializer.data)
     
     @action(
         methods=["get"], 
