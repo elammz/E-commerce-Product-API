@@ -8,6 +8,9 @@ django-mptt-0.16.0
 drf-spectacular
 pytest-cov
 coverage
+django-rest-knox-5.0.2
+django-filter-24.3
+djangorestframework-simplejwt-5.3.1 pyjwt-2.9.0
 
 
 
@@ -43,6 +46,12 @@ pip install pytest-cov
 coverage run -m pytest
 
 python manage.py createsuperuser
+
+pip install django-rest-knox
+
+pip install django-filter
+
+pip install djangorestframework-simplejwt
 
 
 # Pytest

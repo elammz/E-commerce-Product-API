@@ -4,7 +4,28 @@ from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 
 from .fields import OrderField
+from django.contrib.auth.models import AbstractUser
 
+
+class User(AbstractUser):
+    email = models.EmailField(unique=True)
+
+    # Add related_name to avoid conflicts with auth.User
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='custom_user_set',  # Set a custom related name
+        blank=True,
+        help_text='The groups this user belongs to.'
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='custom_user_permissions_set',  # Set a custom related name
+        blank=True,
+        help_text='Specific permissions for this user.'
+    )
+
+    def __str__(self):
+        return self.username
 
 class ActiveQueryset(models.QuerySet):
     def isactive(self):
@@ -131,7 +152,7 @@ class ProductLine(models.Model):
 
 class ProductImage(models.Model):    
     alternative_text = models.CharField(max_length=100)
-    url = models.ImageField(upload_to=None, default="sample.jpg")
+    url = models.ImageField(upload_to='product_images/')
     productline = models.ForeignKey(ProductLine, on_delete=models.CASCADE, related_name="product_image")
     order = OrderField(unique_for_field="productline", blank=True)
 
